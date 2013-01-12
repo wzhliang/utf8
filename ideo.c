@@ -7,6 +7,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+/* Basically print out same thing as
+ * http://jrgraphix.net/r/Unicode/4E00-9FFF
+ */
+
 #define IDEO_MIN 0x4E00
 #define IDEO_MAX 0x9FFF
 #define UTF8_MAX_LEN 6

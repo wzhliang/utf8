@@ -10,7 +10,7 @@
 /* ==================================================
 
 Bits	Last code point	Byte 1	Byte 2	Byte 3	Byte 4	Byte 5	Byte 6
-  7	U+007F	        0xxxxxxx
+ 7	U+007F	        0xxxxxxx
 11	U+07FF	        110xxxxx	10xxxxxx
 16	U+FFFF	        1110xxxx	10xxxxxx	10xxxxxx
 21	U+1FFFFF	11110xxx	10xxxxxx	10xxxxxx	10xxxxxx
@@ -235,13 +235,12 @@ void report(void)
 
 void print_wchar(unsigned char *start, int len)
 {
-	char tmp = *(start + len);
+    int i;
 
-	*(start+len) = 0;
-
-	printf("%s", start);
-
-	*(start+len) = tmp;
+    for (i = 0; i<len; i++)
+    {
+        printf("%c", start[i]);
+    }
 }
 
 #define TST_STR "你好，我叫梁文智。Wenzhi Liang."
@@ -263,10 +262,10 @@ int main(int argc, char **argv)
 		fd = open(argv[1], O_RDONLY);
 		fstat(fd, &st);
 
-		block = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
-		if ( block == NULL )
+		block = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+		if ( block == MAP_FAILED )
 		{
-			printf("Failed to map file.\n");
+			printf("Failed to map file. block: %p\n", block);
 			exit(1);
 		}
 		printf("INPUT: <%s>\n", argv[1]);
