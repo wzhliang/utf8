@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /* ==================================================
 
@@ -223,6 +227,10 @@ void report(void)
 #define TST_STR "你好，我叫梁文智。Wenzhi Liang."
 int main(int argc, char **argv)
 {
+	unsigned char *block;
+	int fd;
+	struct stat st;
+
     init();
 
     if ( argc < 2 )
@@ -230,7 +238,23 @@ int main(int argc, char **argv)
         printf("INPUT: %s\n\n\n", TST_STR);
         analyse((unsigned char*)TST_STR, strlen(TST_STR));
     }
+	else
+	{
+		fd = open(argv[1], O_RDONLY);
+		fstat(fd, &st);
 
+		block = mmap(NULL, st.st_size, PROT_WRITE, MAP_PRIVATE, fd, 0);
+		if ( block == NULL )
+		{
+			printf("Failed to map file.\n");
+			exit(1);
+		}
+		printf("INPUT: <%s>\n", argv[1]);
+		analyse(block, st.st_size);
+		munmap(block, st.st_size);
+		close(fd);
+	}
+					
     report();
     return 0;
 }
