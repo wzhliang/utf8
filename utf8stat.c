@@ -20,6 +20,8 @@ Bits	Last code point	Byte 1	Byte 2	Byte 3	Byte 4	Byte 5	Byte 6
 
 #define TRACE(c) printf("%d, %c\n", (c), (c))
 
+void print_wchar(unsigned char *start, int len);
+
 typedef struct utfstat_tag
 {
     unsigned int _7bits;
@@ -139,7 +141,13 @@ static int try_16bits(unsigned char *start)
 
 static int try_21bits(unsigned char *start)
 {
-    return _try_real(start, IS_21BITS, inc_21bit, 4);
+	int ret = _try_real(start, IS_21BITS, inc_21bit, 4);
+	if ( ret > 0 )
+	{
+		print_wchar(start, 4);
+	}
+
+	return ret;
 }
 
 static int try_26bits(unsigned char *start)
@@ -216,12 +224,24 @@ void report(void)
 	+ stats._21bits + stats._26bits
 	+ stats._31bits;
 
+	printf("\n\n");
     printf(" 7 bits: %07d, %0.2f%%\n", stats._7bits,  100. * stats._7bits/total);
     printf("12 bits: %07d, %0.2f%%\n", stats._12bits, 100. * stats._12bits/total);
     printf("16 bits: %07d, %0.2f%%\n", stats._16bits, 100. * stats._16bits/total);
     printf("21 bits: %07d, %0.2f%%\n", stats._21bits, 100. * stats._21bits/total);
     printf("26 bits: %07d, %0.2f%%\n", stats._26bits, 100. * stats._26bits/total);
     printf("31 bits: %07d, %0.2f%%\n", stats._31bits, 100. * stats._31bits/total);
+}
+
+void print_wchar(unsigned char *start, int len)
+{
+	char tmp = *(start + len);
+
+	*(start+len) = 0;
+
+	printf("%s", start);
+
+	*(start+len) = tmp;
 }
 
 #define TST_STR "你好，我叫梁文智。Wenzhi Liang."
