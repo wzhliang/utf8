@@ -1,0 +1,3 @@
+pinyin_table.txt: from ibus
+fcitx_db.txt: from fcitx
+gb2312-full.txt: from transwiki.org
