@@ -9,6 +9,10 @@
 
 #include "utf8.h"
 
+/*
+ * converts gb2312 full text file into [pinyin Chinese] mapping 
+ */
+
 #define PY_MAX 128 /* Maximum pinyin string length */
 #define TY_MAX 1024 /* Maximum tongyi character string length */
 
@@ -21,6 +25,7 @@ typedef struct py_map_tag
 
 py_map_t *root;
 py_map_t *tail;
+static int count = 0;
 
 py_map_t *find_map(char *py)
 {
@@ -50,6 +55,38 @@ py_map_t *new_map(char *py)
     return new;
 }
 
+char *py2digits(char *py)
+{
+    char *array[8] =
+    {
+        "abc",
+        "def",
+        "ghi",
+        "jkl",
+        "mon",
+        "pqrs",
+        "tuv",
+        "wxyz"
+    };
+    static char digits[PY_MAX];
+
+    int i, j;
+
+    for( j=0; j<strlen(py); j++)
+    {
+        for( i=0; i<8; i++)
+        {
+            if(strchr(array[i], py[j]))
+            {
+                digits[j] = 2+i+'0';
+            }
+        }
+    }
+    digits[j] = 0;
+
+    return digits;
+}
+
 void init(void)
 {
     root = NULL;
@@ -58,7 +95,14 @@ void init(void)
 
 void done(void)
 {
-    /* FIXME */
+    py_map_t *node;
+
+    while(root)
+    {
+        node = root->next;
+        free(root);
+        root = node;
+    }
 }
 
 
@@ -109,6 +153,7 @@ int is_pinyin(char *str)
 
 int is_utf8(unsigned char *str)
 {
+
     while(*str != 0)
     {
         if ( IS_TRAILING(*str) )
@@ -144,6 +189,7 @@ int is_utf8(unsigned char *str)
         return 0;
     }
 
+    count++;
     return 1;
 }
 
@@ -164,7 +210,7 @@ int do_stuff(char *buf, unsigned int len)
         }
         if (i >= len)
         {
-            printf("End of buffer.\n");
+            /*printf("End of buffer.\n");*/
             break;
         }
         *tmp = 0;
@@ -189,7 +235,7 @@ int do_stuff(char *buf, unsigned int len)
         }
         if (i >= len)
         {
-            printf("End of buffer.\n");
+            /*printf("End of buffer.\n");*/
             break;
         }
         buf = tmp;
@@ -204,7 +250,7 @@ void report(void)
     py_map_t *node = root;
     while(node)
     {
-        printf("%s\t%s\n", node->py, node->chinese);
+        printf("%s\t%s\t%s\n", py2digits(node->py), node->py, node->chinese);
         node = node->next;
     }
 }
