@@ -195,8 +195,8 @@ int is_utf8(unsigned char *str)
 
 int do_stuff(char *buf, unsigned int len)
 {
-    char *tmp;
-    unsigned int i;
+    char *tmp = NULL;
+    unsigned int i = 0;
     static char utf[UTF8_MAX_LEN+1];
 
     tmp = buf;
